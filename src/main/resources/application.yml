@@ -1,0 +1,20 @@
+spring:
+  data:
+    mongodb:
+#      uri: mongodb+srv://bachb2014728:lethanhbach2002@bachb2014728.cn96v6t.mongodb.net/
+#      database: "luanvan"
+        database: ${env.MONGO_DATABASE}
+        uri: mongodb+srv://${env.MONGO_USER}:${env.MONGO_PASSWORD}@${env.MONGO_CLUSTER}
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+  web:
+    resources:
+      add-mappings: false
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
+server:
+  port: 8000
