@@ -19,7 +19,7 @@ public class InitImageConfig {
     @Bean
     public CommandLineRunner initImages() {
         return args -> {
-            if (!imageRepository.existsByName("avatar_user_basic")){
+            if (!imageRepository.existsByName(AvatarImage.NAME)){
                 Image image = Image.builder()
                         .id("i01")
                         .name(AvatarImage.NAME)
