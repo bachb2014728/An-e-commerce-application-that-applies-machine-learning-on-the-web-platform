@@ -13,10 +13,9 @@ public class ProductUpdate {
     private String categoryId;
     private String manufacturerId;
     private List<String> images;
-    private String size;
-    private String color;
-    private String material;
+    private List<String> colors;
+    private String description;
     private double weight;
-    private String condition;
+    private String conditionId;
     private List<String> tags;
 }

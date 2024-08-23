@@ -1,9 +1,9 @@
 package com.example.backend.service.Impl;
 
-import com.example.backend.data.AvatarImage;
 import com.example.backend.document.*;
 import com.example.backend.dto.ApiObject;
 import com.example.backend.dto.category.CategoryItem;
+import com.example.backend.dto.condition.ConditionDto;
 import com.example.backend.dto.manufacturer.ManufacturerItem;
 import com.example.backend.dto.product.ProductCreate;
 import com.example.backend.dto.product.ProductDto;
@@ -28,6 +28,8 @@ public class ProductServiceImpl implements ProductService {
     private final ManufacturerRepository manufacturerRepository;
     private final ImageRepository imageRepository;
     private final SellerRepository sellerRepository;
+    private final ColorRepository colorRepository;
+    private final ConditionRepository conditionRepository;
 
     @Override
     public List<ProductItem> getAll() {
@@ -43,23 +45,20 @@ public class ProductServiceImpl implements ProductService {
         Category category = categoryRepository.findById(productCreate.getCategoryId()).orElse(null);
         Manufacturer manufacturer = manufacturerRepository.findById(productCreate.getManufacturerId()).orElse(null);
         List<Image> images = imageRepository.findByIdIn(productCreate.getImages());
+        List<Color> colors = colorRepository.findByIdIn(productCreate.getColors());
         Seller seller = sellerRepository.findById(productCreate.getSellerId())
                 .orElseThrow(() -> new NotFoundException("Không tìm thấy cửa hàng đã thêm sản phẩm với id : "+productCreate.getSellerId()));
+        Condition condition = conditionRepository.findById(productCreate.getConditionId())
+                .orElse(conditionRepository.findAll().get(0));
         Product product = Product.builder()
                 .name(productCreate.getName())
                 .slug(productCreate.getSlug())
                 .price(productCreate.getPrice())
-                .quantity(productCreate.getQuantity())
-                .category(category)
-                .manufacturer(manufacturer)
-                .images(images)
-                .status(true)
-                .size(productCreate.getSize())
-                .color(productCreate.getColor())
-                .condition(productCreate.getCondition())
-                .weight(productCreate.getWeight())
-                .tags(productCreate.getTags())
-                .material(productCreate.getMaterial())
+                .quantity(productCreate.getQuantity()).rating(0)
+                .category(category).manufacturer(manufacturer).images(images)
+                .status(true).colors(colors).weight(productCreate.getWeight())
+                .condition(condition).tags(productCreate.getTags())
+                .description(productCreate.getDescription())
                 .createdAt(ZonedDateTime.now(ZoneId.of("Asia/Ho_Chi_Minh")).toLocalDateTime())
                 .createdBy(seller)
                 .build();
@@ -78,14 +77,14 @@ public class ProductServiceImpl implements ProductService {
     public ProductDto update(String id, ProductUpdate productUpdate) {
         Product product = productRepository.findById(id)
                 .orElseThrow(()-> new NotFoundException("Không tìm thấy sản phẩm với id : "+id));
+        Condition condition = conditionRepository.findById(productUpdate.getConditionId())
+                .orElse(conditionRepository.findAll().get(0));
         product.setName(productUpdate.getName());
         product.setSlug(productUpdate.getSlug());
-        product.setColor(productUpdate.getColor());
-        product.setSize(productUpdate.getSize());
-        product.setMaterial(productUpdate.getMaterial());
         product.setWeight(productUpdate.getWeight());
+        product.setDescription(productUpdate.getDescription());
         product.setTags(productUpdate.getTags());
-        product.setCondition(productUpdate.getCondition());
+        product.setCondition(condition);
         Manufacturer manufacturer = manufacturerRepository.findById(productUpdate.getManufacturerId()).orElse(product.getManufacturer());
         Category category = categoryRepository.findById(productUpdate.getCategoryId()).orElse(product.getCategory());
         product.setCategory(category);
@@ -93,7 +92,7 @@ public class ProductServiceImpl implements ProductService {
         List<Image> images = imageRepository.findByIdIn(productUpdate.getImages());
         for (Image image : product.getImages()){
             if (!isProductInList(images, image)){
-                if (!imageRepository.existsByName(AvatarImage.NAME)){
+                if (!imageRepository.existsByName("product")){
                     imageRepository.deleteById(image.getId());
                 }
             }
@@ -111,10 +110,10 @@ public class ProductServiceImpl implements ProductService {
         Product product = productRepository.findById(id)
                 .orElseThrow(()->new NotFoundException("Không tìm thấy sản phẩm với id : "+id));
         product.setStatus(false);
-        return ApiObject.builder().type("DELETE").message("Tạm xóa sản phẩm khỏi cửa hàng!").build();
+        productRepository.save(product);
+        return ApiObject.builder().message("Tạm xóa sản phẩm khỏi cửa hàng!").build();
     }
     public ProductItem convertProductItem(Product product){
-        System.out.println(product.getImages());
         return ProductItem.builder()
                 .id(product.getId())
                 .name(product.getName())
@@ -137,21 +136,24 @@ public class ProductServiceImpl implements ProductService {
                 .slug(product.getCategory().getSlug())
                 .build();
         List<String> images = product.getImages().stream().map(Image::getId).toList();
+        ConditionDto conditionDto = ConditionDto.builder()
+                .id(product.getCondition().getId())
+                .name(product.getCondition().getName())
+                .normalizedName(product.getCondition().getNormalizedName())
+                .status(product.getCondition().isStatus())
+                .build();
         return ProductDto.builder()
                 .id(product.getId())
                 .name(product.getName())
                 .slug(product.getSlug())
                 .price(product.getPrice())
-                .quantity(product.getQuantity())
-                .manufacturer(manufacturerItem)
-                .category(categoryItem)
-                .images(images)
-                .size(product.getSize())
+                .quantity(product.getQuantity()).manufacturer(manufacturerItem)
+                .category(categoryItem).images(images)
                 .status(product.isStatus())
-                .color(product.getColor())
-                .condition(product.getCondition())
+                .description(product.getDescription())
+                .condition(conditionDto)
+                .rating(product.getRating())
                 .weight(product.getWeight())
-                .material(product.getMaterial())
                 .tags(product.getTags())
                 .createdAt(product.getCreatedAt())
                 .sellerId(product.getCreatedBy().getId())

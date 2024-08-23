@@ -110,7 +110,7 @@ public class SellerServiceImpl implements SellerService {
                 .orElseThrow(() -> new NotFoundException("Không tìm thấy cửa hàng với id : "+id));
         seller.setStatus(false);
         sellerRepository.save(seller);
-        return ApiObject.builder().type("DELETE").message("Đã xóa cửa hàng thành công.").build();
+        return ApiObject.builder().message("Đã xóa cửa hàng thành công.").build();
     }
     public SellerItem convertSellerToSellerItem(Seller seller){
         return SellerItem.builder()

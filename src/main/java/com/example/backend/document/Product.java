@@ -21,20 +21,25 @@ public class Product {
     @Id
     private String id;
     private String name;
+    private String normalizedName;
     private String slug;
-    private double price;
-    private int quantity;
+    private double price = 0;
+    private int quantity = 0;
+    private double weight = 0;
+    private String description;
     @DBRef(lazy = true)
     private Category category;
     @DBRef(lazy = true)
     private Manufacturer manufacturer;
     @DBRef
     private List<Image> images;
-    private String size;
-    private String color;
-    private String material;
-    private double weight;
-    private String condition;
+    @DBRef(lazy = true)
+    private List<Color> colors;
+    @DBRef
+    private List<Comment> comments;
+    private double rating = 0;
+    @DBRef(lazy = true)
+    private Condition condition;
     private List<String> tags;
     private boolean status;
     @CreatedDate

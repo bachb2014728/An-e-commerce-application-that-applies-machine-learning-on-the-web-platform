@@ -1,6 +1,9 @@
 package com.example.backend.dto.product;
 
+import com.example.backend.document.Color;
 import com.example.backend.dto.category.CategoryItem;
+import com.example.backend.dto.comment.CommentDto;
+import com.example.backend.dto.condition.ConditionDto;
 import com.example.backend.dto.manufacturer.ManufacturerItem;
 import lombok.Builder;
 import lombok.Data;
@@ -19,12 +22,13 @@ public class ProductDto {
     private CategoryItem category;
     private ManufacturerItem manufacturer;
     private List<String> images;
-    private String size;
-    private String color;
-    private String material;
+    private List<Color> colors;
+    private List<CommentDto> comments;
+    private double rating;
+    private String description;
     private double weight;
     private boolean status;
-    private String condition;
+    private ConditionDto condition;
     private List<String> tags;
     private LocalDateTime createdAt;
     private String sellerId;

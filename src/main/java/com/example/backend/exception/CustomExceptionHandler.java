@@ -1,6 +1,7 @@
 package com.example.backend.exception;
 
 import com.example.backend.exception.error.AlreadyExistException;
+import com.example.backend.exception.error.ErrorSystemException;
 import com.example.backend.exception.error.NotFoundException;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ProblemDetail;
@@ -34,4 +35,12 @@ public class CustomExceptionHandler {
         problemDetail.setProperty("timestamp", ZonedDateTime.now(ZoneId.of("Asia/Ho_Chi_Minh")));
         return problemDetail;
     }
+    @ExceptionHandler(ErrorSystemException.class)
+    public ProblemDetail handleErrorSystemException(RuntimeException ex) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatusCode.valueOf(500),ex.getMessage());
+        problemDetail.setDetail(ex.getMessage());
+        problemDetail.setProperty("timestamp", ZonedDateTime.now(ZoneId.of("Asia/Ho_Chi_Minh")));
+        return problemDetail;
+    }
+
 }
