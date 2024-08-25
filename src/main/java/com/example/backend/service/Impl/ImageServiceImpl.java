@@ -69,9 +69,7 @@ public class ImageServiceImpl implements ImageService {
         Image image = imageRepository.findById(id)
                 .orElseThrow(()-> new NotFoundException("Không tìm thấy hình ảnh với id : "+id));
         imageRepository.deleteById(id);
-        return ApiObject.builder()
-                .message("Đã xóa hình ảnh thành công").type("DELETE")
-                .build();
+        return ApiObject.builder().message("Đã xóa hình ảnh thành công").build();
     }
 
     @Override
