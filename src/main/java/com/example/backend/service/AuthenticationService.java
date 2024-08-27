@@ -1,12 +1,12 @@
 package com.example.backend.service;
 
-import com.example.backend.dto.LogInRequest;
-import com.example.backend.dto.LogInResponse;
-import com.example.backend.dto.SignUpRequest;
-import com.example.backend.security.CustomUserDetails;
+import com.example.backend.dto.authentication.*;
+import org.springframework.security.core.userdetails.UserDetails;
 
 public interface AuthenticationService {
-    CustomUserDetails signUp(SignUpRequest signUpRequest);
+    SignUpResponse signUp(SignUpRequest signUpRequest);
 
     LogInResponse logIn(LogInRequest logInRequest);
+
+    ProfileResponse profile(UserDetails userDetails);
 }

@@ -70,7 +70,7 @@ public class ImageServiceImpl implements ImageService {
                 .orElseThrow(()-> new NotFoundException("Không tìm thấy hình ảnh với id : "+id));
         imageRepository.deleteById(id);
         return ApiObject.builder().message("Đã xóa hình ảnh thành công").build();
-    }
+    }   
 
     @Override
     public ImageDto updateImage(String id, MultipartFile file) throws IOException {

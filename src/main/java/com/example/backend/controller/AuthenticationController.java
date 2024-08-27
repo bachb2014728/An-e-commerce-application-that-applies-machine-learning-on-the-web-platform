@@ -1,16 +1,13 @@
 package com.example.backend.controller;
 
-import com.example.backend.dto.LogInRequest;
-import com.example.backend.dto.LogInResponse;
-import com.example.backend.dto.SignUpRequest;
-import com.example.backend.security.CustomUserDetails;
+import com.example.backend.dto.authentication.*;
+import com.example.backend.jwt.UserContext;
 import com.example.backend.service.AuthenticationService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("api/v1/authentication")
@@ -18,12 +15,20 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthenticationController {
     private final AuthenticationService authenticationService;
     @PostMapping("/signup")
-    public ResponseEntity<CustomUserDetails> signUp(@RequestBody SignUpRequest signUpRequest){
+    public ResponseEntity<SignUpResponse> signUp(@RequestBody SignUpRequest signUpRequest){
         return ResponseEntity.ok(authenticationService.signUp(signUpRequest));
     }
 
     @PostMapping("/login")
     public ResponseEntity<LogInResponse> logIn(@RequestBody LogInRequest logInRequest) {
         return ResponseEntity.ok(authenticationService.logIn(logInRequest));
+    }
+    @GetMapping("/profile")
+    public ResponseEntity<ProfileResponse> profile(){
+        UserDetails userDetails = UserContext.getUser();
+        if (userDetails == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        return ResponseEntity.ok(authenticationService.profile(userDetails));
     }
 }

@@ -1,5 +1,6 @@
 package com.example.backend.jwt;
 
+import com.example.backend.security.CustomUserDetails;
 import com.example.backend.security.CustomUserDetailsService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -51,6 +52,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     token.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     securityContext.setAuthentication(token);
                     SecurityContextHolder.setContext(securityContext);
+
+                    // Lưu thông tin người dùng vào UserContext
+                    UserContext.setUser(userDetails);
                 }
             }
         } catch (ExpiredJwtException e) {
@@ -67,5 +71,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
         filterChain.doFilter(request,response);
+        // Xóa thông tin người dùng khỏi UserContext sau khi hoàn thành yêu cầu
+        UserContext.clear();
     }
 }

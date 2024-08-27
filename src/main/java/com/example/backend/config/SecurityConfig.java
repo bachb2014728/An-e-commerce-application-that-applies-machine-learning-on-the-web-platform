@@ -18,6 +18,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
 
 @Configuration
 @EnableWebSecurity
@@ -31,6 +33,7 @@ public class SecurityConfig{
     public SecurityFilterChain jwtSecurityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
+                .cors(cors -> cors.configurationSource(request -> new CorsConfiguration().applyPermitDefaultValues()))
                 .authorizeHttpRequests(auth -> {
                     auth.requestMatchers("api/v1/authentication/**").permitAll();
                     auth.requestMatchers("api/v1/**").hasAnyAuthority("ADMIN");
@@ -59,5 +62,11 @@ public class SecurityConfig{
         authenticationProvider.setHideUserNotFoundExceptions(false);
         authenticationProvider.setPasswordEncoder(passwordEncoder());
         return authenticationProvider;
+    }
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/**")
+                .allowedOrigins("http://localhost:8001") // Địa chỉ của ứng dụng Vue.js
+                .allowedMethods("GET", "POST", "PUT", "DELETE", "HEAD")
+                .allowCredentials(true);
     }
 }
